@@ -24,7 +24,7 @@ class TagsInStore(MethodView):
         if TagModel.query.filter(TagModel.store_id == store_id, TagModel.name == tag_data["name"]).first():
             abort(400, message="Duplicate tag name in store")
         
-        tag = TagModel(**tag_data, store_id=store_id)
+        tag = TagModel(store_id=store_id, name=tag_data['name'])  #change made here!!!
 
         try:
             db.session.add(tag)
