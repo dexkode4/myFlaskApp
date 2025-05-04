@@ -8,7 +8,7 @@ from flask_jwt_extended import jwt_required
 from blocklist import BLOCKLIST
 from db import db
 from models import UserModel
-from schemas import UserSchema
+from schemas import UserSchema, UserLoginSchema
 
 blp = Blueprint("Users", __name__, description="Operations on users")
 
@@ -19,14 +19,18 @@ class UserRegister(MethodView):
         if UserModel.query.filter(UserModel.username == user_data["username"]).first():
             abort(409, message="A user with that username already exists.")
         
+        if UserModel.query.filter(UserModel.email == user_data["email"]).first():
+            abort(409, message="A user with that email already exists.")
+        
         user = UserModel(
-            username = user_data["username"],
-            password = pbkdf2_sha256.hash(user_data["password"])
+            username=user_data["username"],
+            email=user_data["email"],
+            password=pbkdf2_sha256.hash(user_data["password"])
         )
         db.session.add(user)
         db.session.commit()
 
-        return {"message": "User created successfully."}, 200
+        return {"message": "User created successfully."}, 201
     
 
 @blp.route("/user/<int:user_id>")
@@ -44,11 +48,21 @@ class User(MethodView):
     
 @blp.route("/login")
 class UserLogin(MethodView):
-    @blp.arguments(UserSchema)
+    @blp.arguments(UserLoginSchema)
     def post(self, user_data):
-        user = UserModel.query.filter(
-            UserModel.username == user_data["username"]
-        ).first()
+        # Check if either username or email is provided
+        if not user_data.get("username") and not user_data.get("email"):
+            abort(400, message="Either username or email is required.")
+        
+        # Try to find user by username or email
+        if user_data.get("username"):
+            user = UserModel.query.filter(
+                UserModel.username == user_data["username"]
+            ).first()
+        else:
+            user = UserModel.query.filter(
+                UserModel.email == user_data["email"]
+            ).first()
 
         if user and pbkdf2_sha256.verify(user_data["password"], user.password):
             access_token = create_access_token(identity=str(user.id), fresh=True)

@@ -9,7 +9,8 @@ class PlainItemSchema(Schema):
 
 class PlainStoreSchema(Schema):
     id = fields.Int(dump_only=True)
-    name = fields.Str()
+    name = fields.Str(required=True)
+    description = fields.Str()
 
 
 class PlainTagSchema(Schema):
@@ -49,4 +50,11 @@ class TagAndItemSchema(Schema):
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
     username = fields.Str(required=True)
+    password = fields.Str(required=True, load_only=True)
+    email = fields.Email(required=True)
+
+
+class UserLoginSchema(Schema):
+    username = fields.Str(required=False)
+    email = fields.Email(required=False)
     password = fields.Str(required=True, load_only=True)

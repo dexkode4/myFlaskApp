@@ -25,7 +25,7 @@ class Store(MethodView):
 
 @blp.route("/store")
 class StoreList(MethodView):
-    @blp.response(200, ItemSchema(many=True))
+    @blp.response(200, StoreSchema(many=True))
     def get(self):
         return StoreModel.query.all()
 
@@ -42,6 +42,6 @@ class StoreList(MethodView):
                 message="A store with that name already exists.",
             )
         except SQLAlchemyError:
-            abort(500, message="An error occurred creating the store.")
+            abort(500, message="An error occurred while inserting the store.")
 
         return store
