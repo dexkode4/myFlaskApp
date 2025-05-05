@@ -24,8 +24,9 @@ def create_app(db_url=None):
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url or os.getenv("DATABASE_URL", "sqlite:///data.db")
+    # postgresql://my_py_flask_db_user:iOUL4JmgDHPbEPZTHZZRmnfSAFTdeKDj@dpg-d0c8mc24d50c73bu0fbg-a.oregon-postgres.render.com/my_py_flask_db
+    # https://rest-api-flask-py-project.onrender.com
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    
     db.init_app(app)
     migrate = Migrate(app, db)
 
