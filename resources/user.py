@@ -1,10 +1,12 @@
-from flask import request
+from flask import request, current_app
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
 from flask_jwt_extended import create_refresh_token, get_jwt_identity, create_access_token, get_jwt
 from flask_jwt_extended import jwt_required
 from sqlalchemy.exc import SQLAlchemyError
+import traceback
+import sys
 
 from blocklist import BLOCKLIST
 from db import db
@@ -33,11 +35,17 @@ class UserRegister(MethodView):
                 db.session.add(user)
                 db.session.commit()
             except SQLAlchemyError as e:
-                abort(500, message=f"An error occurred while saving user: {str(e)}")
+                db.session.rollback()
+                current_app.logger.error(f"Database error during user registration: {str(e)}")
+                current_app.logger.error(traceback.format_exc())
+                abort(500, message=f"Database error during registration: {str(e)}")
 
             return {"message": "User created successfully."}, 201
         except Exception as e:
-            abort(500, message=f"An error occurred during registration: {str(e)}")
+            exc_info = sys.exc_info()
+            current_app.logger.error(f"Error during registration: {str(e)}")
+            current_app.logger.error(''.join(traceback.format_exception(*exc_info)))
+            abort(500, message=f"Error during registration: {str(e)} | Type: {type(e).__name__}")
 
 @blp.route("/user/<int:user_id>")
 class User(MethodView):
