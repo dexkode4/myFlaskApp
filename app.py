@@ -1,5 +1,6 @@
 import os
 import secrets
+from dotenv import load_dotenv
 from flask import Flask, jsonify
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
@@ -7,6 +8,8 @@ from flask_migrate import Migrate
 import logging
 from logging.handlers import RotatingFileHandler
 import traceback
+
+load_dotenv()  # Load environment variables from .env file
 
 from db import db
 from blocklist import BLOCKLIST
