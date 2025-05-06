@@ -20,11 +20,13 @@ class UserRegister(MethodView):
     @blp.arguments(UserSchema)
     def post(self, user_data):
         try:
+            # Check for existing username
             if UserModel.query.filter(UserModel.username == user_data["username"]).first():
-                abort(409, message="A user with that username already exists.")
+                abort(409, message=f"Username '{user_data['username']}' is already taken. Please choose a different username.")
             
+            # Check for existing email
             if UserModel.query.filter(UserModel.email == user_data["email"]).first():
-                abort(409, message="A user with that email already exists.")
+                abort(409, message=f"Email '{user_data['email']}' is already registered. Please use a different email address.")
             
             user = UserModel(
                 username=user_data["username"],
@@ -42,10 +44,16 @@ class UserRegister(MethodView):
 
             return {"message": "User created successfully."}, 201
         except Exception as e:
-            exc_info = sys.exc_info()
-            current_app.logger.error(f"Error during registration: {str(e)}")
-            current_app.logger.error(''.join(traceback.format_exception(*exc_info)))
-            abort(500, message=f"Error during registration: {str(e)} | Type: {type(e).__name__}")
+            if isinstance(e, SQLAlchemyError):
+                db.session.rollback()
+                current_app.logger.error(f"Database error during user registration: {str(e)}")
+                current_app.logger.error(traceback.format_exc())
+                abort(500, message=f"Database error during registration: {str(e)}")
+            else:
+                exc_info = sys.exc_info()
+                current_app.logger.error(f"Error during registration: {str(e)}")
+                current_app.logger.error(''.join(traceback.format_exception(*exc_info)))
+                abort(500, message=f"Error during registration: {str(e)} | Type: {type(e).__name__}")
 
 @blp.route("/user/<int:user_id>")
 class User(MethodView):
