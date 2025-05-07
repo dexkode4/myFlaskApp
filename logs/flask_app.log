@@ -1,0 +1,4 @@
+2025-05-07 10:18:14,340 INFO: Flask App startup [in /app/app.py:36]
+2025-05-07 10:18:14,340 INFO: Using database: postgresql://postgres:password@db/myapp [in /app/app.py:54]
+2025-05-07 10:18:14,353 INFO: Creating database tables... [in /app/app.py:120]
+2025-05-07 10:18:14,379 INFO: Database tables created successfully [in /app/app.py:122]

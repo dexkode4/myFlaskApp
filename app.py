@@ -42,14 +42,7 @@ def create_app(db_url=None):
     app.config["OPENAPI_URL_PREFIX"] = "/"
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
-    
-    # Enhanced database URL configuration
-    if db_url:
-        app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-    elif os.getenv("DATABASE_URL"):
-        app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
-    else:
-        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_url or os.getenv("DATABASE_URL", "sqlite:///data.db")
     
     app.logger.info(f"Using database: {app.config['SQLALCHEMY_DATABASE_URI']}")
     
@@ -135,3 +128,4 @@ def create_app(db_url=None):
 ### start app
 # create the docker image -> docker build -t flask-smorest-api .
 # docker run -dp 5005:5000 -w /app -v "$(pwd):/app" flask-smorest-api
+# rest_api_db_697y_user:I2SpqipnG2LUog85hstkNbQTyG2VGcg8@dpg-d0cva9umcj7s73b0vc10-a.oregon-postgres.render.com/rest_api_db_697y
