@@ -22,7 +22,7 @@ def send_simple_message(to, subject, body):
   	return requests.post(
   		"https://api.mailgun.net/v3/sandbox76c97931eee1438ebbf719dfa16005ef.mailgun.org/messages",
   		auth=("api", os.getenv('MAILGUN_API_KEY')),
-  		data={"from": "Mailgun Sandbox <postmaster@sandbox76c97931eee1438ebbf719dfa16005ef.mailgun.org>",
+  		data={"from": "STORE API <postmaster@sandbox76c97931eee1438ebbf719dfa16005ef.mailgun.org>",
 			"to": [to],
   			"subject": subject,
   			"text": body})
